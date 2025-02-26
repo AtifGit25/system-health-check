@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Enable Debugging
+set -x
+
+# Infinite Loop for the Menu
 while true; do
     echo "================================="
     echo "  System Health Check Menu"
@@ -17,22 +21,40 @@ while true; do
     case $choice in
         1) 
             echo "Checking Disk Usage..."
-            df -h
+            if df -h; then
+                echo "Disk Usage check successful!"
+            else
+                echo "Error: Failed to check Disk Usage."
+            fi
             ;;
         2) 
             echo "Monitoring Running Processes..."
-            tasklist | head -20
+            if tasklist | head -20; then
+                echo "Process Monitoring successful!"
+            else
+                echo "Error: Failed to monitor processes."
+            fi
             ;;
         3) 
             echo "Assessing Memory Usage..."
-            systeminfo | grep "Total Physical Memory"
+            if systeminfo | findstr /C:"Total Physical Memory"; then
+                echo "Memory Usage check successful!"
+            else
+                echo "Error: Failed to check Memory Usage."
+            fi
             ;;
         4) 
             echo "Evaluating CPU Usage..."
-            wmic cpu get loadpercentage
+            if wmic cpu get loadpercentage; then
+                echo "CPU Usage check successful!"
+            else
+                echo "Error: Failed to check CPU Usage."
+            fi
             ;;
         5) 
             echo "Exiting..."
+            # Disable Debugging
+            set +x
             exit 0
             ;;
         *) 
