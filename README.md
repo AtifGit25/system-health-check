@@ -1,2 +1,2 @@
 # system-health-check
-A menu-driven script for monitoring system health
+A menu-driven python script for monitoring system health
