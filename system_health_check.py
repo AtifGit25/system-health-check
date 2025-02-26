@@ -31,13 +31,15 @@ def check_cpu():
     except Exception as e:
         return f"Error checking CPU: {e}"
 
-# Function to monitor running services
+# Function to monitor top 20 running services
 def monitor_services():
     try:
         services = []
         for proc in psutil.process_iter(['pid', 'name']):
             services.append(proc.info['name'])
-        return f"Running Services: {', '.join(services)}"
+            if len(services) >= 20:  # Limit to top 20 services
+                break
+        return f"Top 20 Running Services:\n{', '.join(services)}"
     except Exception as e:
         return f"Error monitoring services: {e}"
 
@@ -68,7 +70,7 @@ def display_menu():
     print("1. Check Disk Usage")
     print("2. Check Memory Usage")
     print("3. Check CPU Usage")
-    print("4. Monitor Running Services")
+    print("4. Monitor Top 20 Running Services")
     print("5. Send Email Report")
     print("6. Exit")
 
