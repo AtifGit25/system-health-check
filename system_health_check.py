@@ -1,11 +1,10 @@
 import psutil
 import smtplib
 from email.mime.text import MIMEText
-import time
 import os
 from dotenv import load_dotenv
 
-# Load email credentials from .env file
+# Load environment variables from .env file
 load_dotenv()
 
 # Function to check disk usage
@@ -32,6 +31,16 @@ def check_cpu():
     except Exception as e:
         return f"Error checking CPU: {e}"
 
+# Function to monitor running services
+def monitor_services():
+    try:
+        services = []
+        for proc in psutil.process_iter(['pid', 'name']):
+            services.append(proc.info['name'])
+        return f"Running Services: {', '.join(services)}"
+    except Exception as e:
+        return f"Error monitoring services: {e}"
+
 # Function to send email
 def send_email(receiver, report):
     try:
@@ -53,41 +62,52 @@ def send_email(receiver, report):
     except Exception as e:
         print(f"Failed to send email: {e}")
 
+# Function to display the menu
+def display_menu():
+    print("\nSystem Health Check Tool")
+    print("1. Check Disk Usage")
+    print("2. Check Memory Usage")
+    print("3. Check CPU Usage")
+    print("4. Monitor Running Services")
+    print("5. Send Email Report")
+    print("6. Exit")
+
 # Main function
 def main():
-    receiver = input("Enter recipient's email: ")  # Ask for email
-    interval = 4 * 60 * 60  # 4 hours in seconds
-
     while True:
-        print("Checking system health...")
+        display_menu()
+        choice = input("Enter your choice (1-6): ")
 
-        # Perform health checks
-        disk = check_disk()
-        memory = check_memory()
-        cpu = check_cpu()
-
-        # Create the report
-        report = f"""
-        System Health Report:
-        {disk}
-        {memory}
-        {cpu}
-        Report generated at: {time.ctime()}
-        """
-
-        # Print and send the report
-        print(report)
-        send_email(receiver, report)
-
-        # Wait for the next check
-        print(f"Next check in {interval // 3600} hours...")
-        time.sleep(interval)
+        if choice == '1':
+            print(check_disk())
+        elif choice == '2':
+            print(check_memory())
+        elif choice == '3':
+            print(check_cpu())
+        elif choice == '4':
+            print(monitor_services())
+        elif choice == '5':
+            receiver = input("Enter recipient's email: ")
+            report = "\n".join([
+                check_disk(),
+                check_memory(),
+                check_cpu(),
+                monitor_services(),
+                f"Report generated at: {time.ctime()}"
+            ])
+            send_email(receiver, report)
+        elif choice == '6':
+            print("Exiting the program. Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please select a valid option.")
 
 # Run the script
 if __name__ == "__main__":
+    import time
     try:
         main()
     except KeyboardInterrupt:
-        print("Script stopped by the user.")
+        print("\nScript stopped by the user.")
     except Exception as e:
         print(f"An error occurred: {e}")
